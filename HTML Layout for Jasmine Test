@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>@ViewBag.Title - Sabio</title>
+   
+    <link type="text/css" rel="stylesheet" href="//unpkg.com/bootstrap-vue@latest/dist/bootstrap-vue.css" />
+    <link href="/Content/jasmine/jasmine.css" rel="stylesheet" />
+    <style>
+        .jasmine_html-reporter {
+            width: 100%;
+        }
+    </style>
+</head>
+<body>
+
+    <main role="main" class="container">
+        <div class="row" id="testResults">
+        </div>
+    </main><!-- /.container -->
+
+    <!--  Include jquery and bootstrap 
+    @Scripts.Render("~/bundles/jquery")
+    @Scripts.Render("~/bundles/bootstrap") -->
+
+    <script src="/Scripts/dest/webapp/app.js"></script>
+    <script src="/dynamic/js/config" type="text/javascript"></script>
+    
+    <script src="/Scripts/jasmine/jasmine.js"></script>
+    <script src="/Scripts/jasmine/jasmine-html.js"></script>
+    <script src="/Scripts/jasmine/boot.js"></script>
+    <script src="/Scripts/jasmine/jasmine-jquery.js"></script>
+    
+    <script src="~/Scripts/tests-helpers/init.js"></script>
+    <script src="~/Scripts/tests-helpers/logInUser.js"></script>
+    <script src="~/Scripts/tests-helpers/slugCreator.js"></script>
+
+    <script>
+
+        (function (app) {
+
+            app.runTests = _runTests;
+            app.tests.debugResponse = false;
+
+            window.setTimeout(app.runTests, 1);
+
+            function _runTests() {
+
+                if (!app.tests.isAnonymous) {
+                    app.tests.logInUser();
+                }
+                else {
+                    console.warn("Running tests for isAnonymous be sure you have cookies deleted.")
+                }
+
+                for (var i = 0; i < app.testSpecs.length; i++) {
+                    const currentSpec = app.testSpecs[i];
+                    currentSpec();
+                }
+
+                //jasmine.getEnv().execute();
+            }
+
+
+        })(webApp);
+
+    </script>
+    
+    <!-- INCLUDE SPECS --!>
+    <script src="~/Scripts/tests/companies.tests.js"></script>
+
+</body>
+</html>
