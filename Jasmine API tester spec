@@ -1,0 +1,239 @@
+(function (app) {
+
+
+    app.testSpecs = app.testSpecs || [];
+
+    app.testSpecs.push(companySpecs);
+
+    let helpers = app.tests.helpers;
+
+    function companySpecs() {
+
+        var companyInstanceId,
+            companyUrlInstanceId,
+            companyImageInstanceId;
+
+
+
+        let slugId = app.tests.makeSlugId();
+        let slug = "companies-" + slugId;
+
+
+        const companyModel = {
+            "id": companyInstanceId,
+            "userId": 22,
+            "headline": "Testing Name headline",
+            "name": "Testing Company Name",
+            "summary": "Testing Summary for Company",
+            "profile": "Testing the profile",
+            "slug": slug,
+            "statusId": 1,
+        };
+
+        var entityInstanceId;
+
+        var thisUser = {
+            id: 22
+            , userName: 'testUser'
+            , role: 'admin'
+        };
+        let searchQuery = "?q=testing";
+
+        let pageData = { pageIndex: 0, pageSize: 10 };
+
+
+        app.tests.user = thisUser;
+        app.tests.logInUser();
+
+
+
+        // Specs
+        describe("Companies Posting", function () {
+            "use strict";
+            let response, errResponse;
+
+            beforeEach(function (done) {
+                var addPromise = app.services.companies.post(companyModel).then(
+                    function (ajaxResponse) {
+                        response = ajaxResponse;
+                        entityInstanceId = response.item;
+                        done();
+                    },
+                    function (errData) {
+                        errResponse = errData;
+                        done();
+                    }).always(function () {
+
+                        done();
+                    });
+            });
+
+            it("Should have returned valid response", function () {
+                helpers.isValidResponse(response);
+                expect(response.item).not.toBeUndefined();
+                expect(response.item).toBeGreaterThan(0);
+            });
+
+        });
+
+        // Specs
+        describe("Companies Getting By Id", function () {
+            let response, errResponse;
+
+            beforeEach(function (done) {
+                app.services.companies.getById(entityInstanceId)
+                    .then(
+                    function (ajaxResponse) {
+                        response = ajaxResponse;
+                        done();
+                    },
+                    function (errData) {
+                        errResponse = errData;
+                        done();
+                    });
+            });
+
+            it("Should have returned valid GET response", function () {
+                //more should be test than the id here without going crazy
+                helpers.isValidResponse(response);
+                expect(response.item).not.toBeUndefined();
+                expect(response.item.id).toBeGreaterThan(0);
+            });
+
+        });
+
+        // Specs
+        describe("Companies PUT test", function () {
+            let response, errResponse;
+
+            beforeEach(function (done) {
+
+                companyModel.id = entityInstanceId;
+
+                app.services.companies.update(companyModel)
+                    .then(
+                    function (ajaxResponse) {
+                        response = ajaxResponse;
+                        done();
+                    },
+                    function (errData) {
+                        errResponse = errData;
+                        done();
+                    });
+            });
+
+            it("Should have returned valid response", function () {
+                helpers.isValidItemResponse(response, false);
+                expect(response.isSuccessful).toBeTruthy();
+            });
+
+        });
+
+        // Specs
+        describe("Companies Getting By Entity Type and Slug", function () {
+            let response, errResponse;
+
+            beforeEach(function (done) {
+
+                app.services.companies.getBySlug(companyModel.slug)
+                    .then(
+                    function (ajaxResponse) {
+                        response = ajaxResponse;
+                        done();
+                    },
+                    function (errData) {
+                        errResponse = errData;
+                        done();
+                    });
+            });
+
+            it("Should have returned valid GET response", function () {
+                //more should be test than the id here without going crazy
+                helpers.isValidResponse(response);
+                expect(response.item).not.toBeUndefined();
+                expect(response.item.entityTypeId).toBeGreaterThan(0);
+                expect(response.item.slug).not.toBeUndefined();
+            });
+
+        });
+
+        // Specs
+        describe("Companies Getting By Entity type, page index, and page size", function () {
+            let response, errResponse;
+
+            beforeEach(function (done) {
+                app.services.companies.get(pageData)
+                    .then(
+                    function (ajaxResponse) {
+                        response = ajaxResponse;
+                        done();
+                    },
+                    function (errData) {
+                        errResponse = errData;
+                        done();
+                    });
+            });
+
+            it("Should have returned valid GET response", function () {
+                //more should be test than the id here without going crazy
+                helpers.isValidResponse(response);
+                expect(response.item).not.toBeUndefined();
+            });
+        });
+
+        // Specs
+        describe("Companies Search Getting By page index, and page size", function () {
+            let response, errResponse;
+            pageData.query = searchQuery;
+
+            beforeEach(function (done) {
+                app.services.companies.search(pageData)
+                    .then(
+                    function (ajaxResponse) {
+                        response = ajaxResponse;
+                        done();
+                    },
+                    function (errData) {
+                        errResponse = errData;
+                        done();
+                    });
+            });
+
+            it("Should have returned valid GET response", function () {
+                //more should be test than the id here without going crazy
+                helpers.isValidResponse(response);
+                expect(response.item).not.toBeUndefined();
+                expect(response.isSuccessful).toBeTruthy();
+            });
+
+        });
+
+        // Specs
+        describe("Companies Updating status by id", function () {
+            let response, errResponse;
+
+            beforeEach(function (done) {
+                var statusId = 1;
+                app.services.companies.updateStatus(entityInstanceId, statusId)
+                    .then(
+                    function (ajaxResponse) {
+                        response = ajaxResponse;
+                        done();
+                    },
+                    function (errData) {
+                        errResponse = errData;
+                        done();
+                    });
+            });
+
+            it("Should have returned valid PUT response", function () {
+                helpers.isValidResponse(response);
+                expect(response.isSuccessful).toBeTruthy();
+            });
+
+        });
+
+
+    }
+
+})(webApp);
